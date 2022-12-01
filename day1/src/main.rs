@@ -27,9 +27,8 @@ fn part_one(input: &[u32]) -> u32 {
 }
 
 fn part_two(mut input: Vec<u32>) -> u32 {
-    input.sort();
-    input.reverse();
-    input.first().unwrap() + input.get(1).unwrap() + input.get(2).unwrap()
+    input.sort_by(|a, b| b.cmp(a));
+    input[0..3].iter().sum()
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<u32>> {
