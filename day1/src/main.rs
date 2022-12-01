@@ -1,4 +1,5 @@
 use anyhow::Result;
+use nom::sequence::pair;
 use nom::{
     character::complete::{digit1, line_ending},
     combinator::map,
@@ -14,30 +15,38 @@ fn main() -> Result<()> {
     println!("Result part one: {}", result);
     println!("Time spent: {}", took);
 
-    let (took, result) = took::took(|| part_two(&input));
+    let (took, result) = took::took(|| part_two(input));
     println!("Result part two: {}", result);
     println!("Time spent: {}", took);
 
     Ok(())
 }
 
-fn part_one(_input: &[u16]) -> usize {
-    unimplemented!()
+fn part_one(input: &[u32]) -> u32 {
+    *input.iter().max().unwrap()
 }
 
-fn part_two(_input: &[u16]) -> usize {
-    unimplemented!()
+fn part_two(mut input: Vec<u32>) -> u32 {
+    input.sort();
+    input.reverse();
+    input.first().unwrap() + input.get(1).unwrap() + input.get(2).unwrap()
 }
 
-fn parse(input: &str) -> IResult<&str, Vec<u16>> {
-    separated_list1(line_ending, parse_line)(input)
+fn parse(input: &str) -> IResult<&str, Vec<u32>> {
+    separated_list1(pair(line_ending, line_ending), parse_lines)(input)
 }
 
-fn parse_line(input: &str) -> IResult<&str, u16> {
-    map(digit1, |num: &str| num.parse::<u16>().unwrap())(input)
+fn parse_lines(input: &str) -> IResult<&str, u32> {
+    map(separated_list1(line_ending, parse_line), |items| {
+        items.iter().sum()
+    })(input)
 }
 
-fn read_input() -> Result<Vec<u16>> {
+fn parse_line(input: &str) -> IResult<&str, u32> {
+    map(digit1, |num: &str| num.parse::<u32>().unwrap())(input)
+}
+
+fn read_input() -> Result<Vec<u32>> {
     let mut buf = String::new();
     fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
 
@@ -56,7 +65,7 @@ mod tests {
 
         let count = part_one(&input);
 
-        assert_eq!(0, count);
+        assert_eq!(72511, count);
 
         Ok(())
     }
@@ -65,9 +74,9 @@ mod tests {
     fn test_part_two() -> Result<()> {
         let input = read_input()?;
 
-        let count = part_two(&input);
+        let count = part_two(input);
 
-        assert_eq!(0, count);
+        assert_eq!(212117, count);
 
         Ok(())
     }
