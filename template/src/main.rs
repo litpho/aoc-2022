@@ -1,7 +1,7 @@
 use anyhow::Result;
 use nom::{
     character::complete::{digit1, line_ending},
-    combinator::map,
+    combinator::map_res,
     multi::separated_list1,
     IResult,
 };
@@ -11,15 +11,11 @@ use took::{Timer, took};
 fn main() -> Result<()> {
     let input = read_input()?;
 
-    let (took, result) = took::took(|| {
-        part_one(&input)
-    });
+    let (took, result) = took::took(|| part_one(&input));
     println!("Result part one: {}", result);
     println!("Time spent: {}", took);
 
-    let (took, result) = took::took(|| {
-        part_one(&input)
-    });
+    let (took, result) = took::took(|| part_two(input));
     println!("Result part two: {}", result);
     println!("Time spent: {}", took);
 
@@ -39,14 +35,14 @@ fn parse(input: &str) -> IResult<&str, Vec<u16>> {
 }
 
 fn parse_line(input: &str) -> IResult<&str, u16> {
-    map(digit1, |num: &str| num.parse::<u16>().unwrap())(input)
+    map_res(digit1, |num: &str| num.parse::<u16>())(input)
 }
 
 fn read_input() -> Result<Vec<u16>> {
     let mut buf = String::new();
     fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
 
-    let (_, input) = parse(&buf).ok().unwrap();
+    let (_, input) = parse(&buf).expect("Parse failure");
 
     Ok(input)
 }

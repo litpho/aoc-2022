@@ -1,13 +1,14 @@
+use std::{fs, io::Read};
+
 use anyhow::{Error, Result};
-use nom::combinator::map_res;
 use nom::sequence::pair;
 use nom::{
     character::complete::{digit1, line_ending},
     combinator::map,
+    combinator::map_res,
     multi::separated_list1,
     IResult,
 };
-use std::{fs, io::Read};
 
 fn main() -> Result<()> {
     let input = read_input()?;
@@ -24,7 +25,10 @@ fn main() -> Result<()> {
 }
 
 fn part_one(input: &[u32]) -> Result<&u32> {
-    input.iter().max().ok_or_else(|| Error::msg("There was no maximum"))
+    input
+        .iter()
+        .max()
+        .ok_or_else(|| Error::msg("There was no maximum"))
 }
 
 fn part_two(mut input: Vec<u32>) -> u32 {
