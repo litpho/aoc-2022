@@ -18,8 +18,8 @@ fn main() -> Result<()> {
     println!("Time spent: {}", took);
 
     let (took, result) = took::took(|| part_two(input));
-    println!("Result part two: {}", result);
-    println!("Time spent: {}", took);
+    println!("Result part two: {result}");
+    println!("Time spent: {took}");
 
     Ok(())
 }
