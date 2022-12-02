@@ -5,7 +5,6 @@ use nom::{
     sequence::separated_pair,
     IResult,
 };
-use std::{fs, io::Read};
 
 fn main() -> Result<()> {
     let input = read_input()?;
@@ -150,10 +149,9 @@ fn parse_line(input: &str) -> IResult<&str, (char, char)> {
 }
 
 fn read_input() -> Result<Vec<(char, char)>> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
+    let buf = include_str!("input.txt");
 
-    let (_, input) = parse(&buf).expect("Parse failure");
+    let (_, input) = parse(buf).expect("Parse failure");
 
     Ok(input)
 }

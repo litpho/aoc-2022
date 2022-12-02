@@ -1,5 +1,3 @@
-use std::{fs, io::Read};
-
 use anyhow::{Error, Result};
 use nom::sequence::pair;
 use nom::{
@@ -51,10 +49,9 @@ fn parse_line(input: &str) -> IResult<&str, u32> {
 }
 
 fn read_input() -> Result<Vec<u32>> {
-    let mut buf = String::new();
-    fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
+    let buf = include_str!("input.txt");
 
-    let (_, input) = parse(&buf).expect("Parse failure");
+    let (_, input) = parse(buf).expect("Parse failure");
 
     Ok(input)
 }
