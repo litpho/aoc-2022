@@ -1,4 +1,5 @@
-use anyhow::Result;
+use anyhow::{Error, Result};
+use nom::combinator::map_res;
 use nom::sequence::pair;
 use nom::{
     character::complete::{digit1, line_ending},
@@ -12,7 +13,7 @@ fn main() -> Result<()> {
     let input = read_input()?;
 
     let (took, result) = took::took(|| part_one(&input));
-    println!("Result part one: {}", result);
+    println!("Result part one: {}", result?);
     println!("Time spent: {}", took);
 
     let (took, result) = took::took(|| part_two(input));
@@ -22,8 +23,8 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn part_one(input: &[u32]) -> u32 {
-    *input.iter().max().unwrap()
+fn part_one(input: &[u32]) -> Result<&u32> {
+    input.iter().max().ok_or_else(|| Error::msg("There was no maximum"))
 }
 
 fn part_two(mut input: Vec<u32>) -> u32 {
@@ -42,14 +43,14 @@ fn parse_lines(input: &str) -> IResult<&str, u32> {
 }
 
 fn parse_line(input: &str) -> IResult<&str, u32> {
-    map(digit1, |num: &str| num.parse::<u32>().unwrap())(input)
+    map_res(digit1, |num: &str| num.parse::<u32>())(input)
 }
 
 fn read_input() -> Result<Vec<u32>> {
     let mut buf = String::new();
     fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
 
-    let (_, input) = parse(&buf).ok().unwrap();
+    let (_, input) = parse(&buf).expect("Parse failure");
 
     Ok(input)
 }
@@ -62,9 +63,9 @@ mod tests {
     fn test_part_one() -> Result<()> {
         let input = read_input()?;
 
-        let count = part_one(&input);
+        let count = part_one(&input)?;
 
-        assert_eq!(72511, count);
+        assert_eq!(72511, *count);
 
         Ok(())
     }

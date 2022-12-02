@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Error, Result};
 use nom::{
     character::{complete, complete::line_ending, complete::one_of},
     multi::separated_list1,
@@ -11,34 +11,38 @@ fn main() -> Result<()> {
     let input = read_input()?;
 
     let (took, result) = took::took(|| part_one(&input));
-    println!("Result part one: {}", result);
+    println!("Result part one: {}", result?);
     println!("Time spent: {}", took);
 
     let (took, result) = took::took(|| part_two(&input));
-    println!("Result part two: {}", result);
+    println!("Result part two: {}", result?);
     println!("Time spent: {}", took);
 
     Ok(())
 }
 
-fn part_one(input: &[(char, char)]) -> u32 {
-    input
+fn part_one(input: &[(char, char)]) -> Result<u32> {
+    Ok(input
         .iter()
-        .map(|(them, us)| (Move::try_from(*them).unwrap(), Move::try_from(*us).unwrap()))
-        .map(|(them, us)| Move::score(&them, &us))
-        .sum()
+        .map(|(them, us)| Ok((Move::try_from(*them)?, Move::try_from(*us)?)))
+        .collect::<Result<Vec<(Move, Move)>>>()?
+        .iter()
+        .map(|(them, us)| Move::score(them, us))
+        .sum())
 }
 
-fn part_two(input: &[(char, char)]) -> u32 {
-    input
+fn part_two(input: &[(char, char)]) -> Result<u32> {
+    Ok(input
         .iter()
         .map(|(them, us)| {
-            let their_move = Move::try_from(*them).unwrap();
-            let matched_move = Move::match_move(&their_move, Outcome::try_from(*us).unwrap());
-            (their_move, matched_move)
+            let their_move = Move::try_from(*them)?;
+            let matched_move = Move::match_move(&their_move, Outcome::try_from(*us)?);
+            Ok((their_move, matched_move))
         })
-        .map(|(them, us)| Move::score(&them, &us))
-        .sum()
+        .collect::<Result<Vec<(Move, Move)>>>()?
+        .iter()
+        .map(|(them, us)| Move::score(them, us))
+        .sum())
 }
 
 #[derive(Debug)]
@@ -59,14 +63,14 @@ impl Outcome {
 }
 
 impl TryFrom<char> for Outcome {
-    type Error = String;
+    type Error = Error;
 
     fn try_from(value: char) -> std::result::Result<Self, Self::Error> {
         let outcome = match value {
             'X' => Outcome::Lose,
             'Y' => Outcome::Draw,
             'Z' => Outcome::Win,
-            _ => return Err(format!("{} is not a valid outcome", value)),
+            _ => return Err(Error::msg(format!("{} is not a valid outcome", value))),
         };
 
         Ok(outcome)
@@ -123,14 +127,14 @@ impl Move {
 }
 
 impl TryFrom<char> for Move {
-    type Error = String;
+    type Error = Error;
 
     fn try_from(value: char) -> std::result::Result<Self, Self::Error> {
         let outcome = match value {
             'A' | 'X' => Move::Rock,
             'B' | 'Y' => Move::Paper,
             'C' | 'Z' => Move::Scissors,
-            _ => return Err(format!("{} is not a valid move", value)),
+            _ => return Err(Error::msg(format!("{} is not a valid move", value))),
         };
 
         Ok(outcome)
@@ -149,7 +153,7 @@ fn read_input() -> Result<Vec<(char, char)>> {
     let mut buf = String::new();
     fs::File::open("src/input.txt")?.read_to_string(&mut buf)?;
 
-    let (_, input) = parse(&buf).ok().unwrap();
+    let (_, input) = parse(&buf).expect("Parse failure");
 
     Ok(input)
 }
@@ -162,7 +166,7 @@ mod tests {
     fn test_part_one() -> Result<()> {
         let input = read_input()?;
 
-        let count = part_one(&input);
+        let count = part_one(&input)?;
 
         assert_eq!(10718, count);
 
@@ -173,7 +177,7 @@ mod tests {
     fn test_part_two() -> Result<()> {
         let input = read_input()?;
 
-        let count = part_two(&input);
+        let count = part_two(&input)?;
 
         assert_eq!(14652, count);
 
