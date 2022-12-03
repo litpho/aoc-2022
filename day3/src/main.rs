@@ -8,51 +8,41 @@ use nom::{
 fn main() -> Result<()> {
     let input = read_input()?;
 
-    let (took, result) = took::took(|| part_one(input));
+    let (took, result) = took::took(|| part_one(&input));
     println!("Result part one: {}", result);
     println!("Time spent: {took}");
 
     let input = read_input()?;
-    let (took, result) = took::took(|| part_two(input));
+    let (took, result) = took::took(|| part_two(&input));
     println!("Result part two: {}", result);
     println!("Time spent: {took}");
 
     Ok(())
 }
 
-fn part_one(input: Vec<&str>) -> u32 {
+fn part_one(input: &[&str]) -> u32 {
     input
         .iter()
         .map(|s| s.split_at(s.len() / 2))
-        .map(|(a, b)| {
-            let mut a_chars = a.chars().collect::<Vec<char>>();
-            a_chars.sort();
-            a_chars.dedup();
-            a_chars
-                .iter()
-                .filter(|a_char| b.contains(**a_char))
-                .map(|c| get_value(*c))
-                .sum::<u32>()
-        })
+        .map(|(a, b)| get_sum(a, &[b]))
         .sum::<u32>()
 }
 
-fn part_two(input: Vec<&str>) -> u32 {
+fn part_two(input: &[&str]) -> u32 {
     input
         .chunks(3)
-        .map(|lines| {
-            let a = lines[0];
-            let b = lines[1];
-            let c = lines[2];
-            let mut a_chars = a.chars().collect::<Vec<char>>();
-            a_chars.sort();
-            a_chars.dedup();
-            a_chars
-                .iter()
-                .filter(|a_char| b.contains(**a_char) && c.contains(**a_char))
-                .map(|c| get_value(*c))
-                .sum::<u32>()
-        })
+        .map(|lines| get_sum(lines[0], &(lines[1..=2])))
+        .sum::<u32>()
+}
+
+fn get_sum(a: &str, rest: &[&str]) -> u32 {
+    let mut a_chars = a.chars().collect::<Vec<char>>();
+    a_chars.sort();
+    a_chars.dedup();
+    a_chars
+        .iter()
+        .filter(|a_char| rest.iter().all(|r| r.contains(**a_char)))
+        .map(|c| get_value(*c))
         .sum::<u32>()
 }
 
@@ -88,7 +78,7 @@ mod tests {
     fn test_part_one() -> Result<()> {
         let input = read_input()?;
 
-        let count = part_one(input);
+        let count = part_one(&input);
 
         assert_eq!(7980, count);
 
@@ -99,7 +89,7 @@ mod tests {
     fn test_part_two() -> Result<()> {
         let input = read_input()?;
 
-        let count = part_two(input);
+        let count = part_two(&input);
 
         assert_eq!(2881, count);
 
