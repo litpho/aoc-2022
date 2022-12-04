@@ -1,11 +1,7 @@
 use anyhow::{Error, Result};
-use nom::sequence::pair;
 use nom::{
-    character::complete::{digit1, line_ending},
-    combinator::map,
-    combinator::map_res,
-    multi::separated_list1,
-    IResult,
+    character::complete, character::complete::line_ending, combinator::map, multi::separated_list1,
+    sequence::pair, IResult,
 };
 
 fn main() -> Result<()> {
@@ -39,13 +35,9 @@ fn parse(input: &str) -> IResult<&str, Vec<u32>> {
 }
 
 fn parse_lines(input: &str) -> IResult<&str, u32> {
-    map(separated_list1(line_ending, parse_line), |items| {
+    map(separated_list1(line_ending, complete::u32), |items| {
         items.iter().sum()
     })(input)
-}
-
-fn parse_line(input: &str) -> IResult<&str, u32> {
-    map_res(digit1, |num: &str| num.parse::<u32>())(input)
 }
 
 fn read_input() -> Result<Vec<u32>> {
