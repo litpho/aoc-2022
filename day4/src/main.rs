@@ -1,11 +1,10 @@
-use anyhow::Result;
-use nom::character::complete;
-use nom::character::complete::digit1;
-use nom::combinator::{map, map_res};
-use nom::sequence::separated_pair;
-use nom::{character::complete::line_ending, multi::separated_list1, IResult};
 use std::ops::RangeInclusive;
-use std::str::FromStr;
+
+use anyhow::Result;
+use nom::{
+    character::complete, character::complete::line_ending, combinator::map, multi::separated_list1,
+    sequence::separated_pair, IResult,
+};
 
 fn main() -> Result<()> {
     let input = read_input()?;
@@ -25,36 +24,31 @@ fn main() -> Result<()> {
 fn part_one(input: &[AssignmentPair]) -> usize {
     input
         .iter()
-        .filter(|ap| ap.first.envelopes(&ap.second) || ap.second.envelopes(&ap.first))
+        .filter(|ap| ap.one_range_envelopes_the_other())
         .count()
 }
 
 fn part_two(input: &[AssignmentPair]) -> usize {
     input
         .iter()
-        .filter(|ap| ap.first.overlaps(&ap.second) || ap.second.overlaps(&ap.first))
+        .filter(|ap| ap.one_range_overlaps_the_other())
         .count()
-}
-
-trait RangeInclusiveExt {
-    fn envelopes(&self, other: &Self) -> bool;
-    fn overlaps(&self, other: &Self) -> bool;
-}
-
-impl RangeInclusiveExt for RangeInclusive<u32> {
-    fn envelopes(&self, other: &Self) -> bool {
-        self.contains(other.start()) && self.contains(other.end())
-    }
-
-    fn overlaps(&self, other: &Self) -> bool {
-        (self.start() <= other.start() && self.end() >= other.start())
-            || (self.start() <= other.end() && self.end() >= other.end())
-    }
 }
 
 struct AssignmentPair {
     first: RangeInclusive<u32>,
     second: RangeInclusive<u32>,
+}
+
+impl AssignmentPair {
+    pub fn one_range_envelopes_the_other(&self) -> bool {
+        (self.first.contains(self.second.start()) && self.first.contains(self.second.end()))
+            || (self.second.contains(self.first.start()) && self.second.contains(self.first.end()))
+    }
+
+    pub fn one_range_overlaps_the_other(&self) -> bool {
+        !(self.first.start() > self.second.end() || self.first.end() < self.second.start())
+    }
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<AssignmentPair>> {
@@ -70,13 +64,9 @@ fn parse_line(input: &str) -> IResult<&str, AssignmentPair> {
 
 fn parse_range(input: &str) -> IResult<&str, RangeInclusive<u32>> {
     map(
-        separated_pair(parse_item, complete::char('-'), parse_item),
+        separated_pair(complete::u32, complete::char('-'), complete::u32),
         |(start, end)| start..=end,
     )(input)
-}
-
-fn parse_item(input: &str) -> IResult<&str, u32> {
-    map_res(digit1, u32::from_str)(input)
 }
 
 fn read_input() -> Result<Vec<AssignmentPair>> {
