@@ -42,13 +42,9 @@ fn part_one(mut crates: Vec<Vec<char>>, instructions: &[Instruction]) -> String 
 
 fn part_two(mut crates: Vec<Vec<char>>, instructions: &[Instruction]) -> String {
     for instruction in instructions.iter() {
-        let mut buf = vec![];
-        (0..instruction.amount).for_each(|_| {
-            let cr = crates[instruction.from - 1].pop().unwrap();
-            buf.push(cr);
-        });
-        buf.reverse();
-        crates[instruction.to - 1].append(&mut buf);
+        let idx = crates[instruction.from - 1].len() - instruction.amount;
+        let buf = crates[instruction.from - 1].split_off(idx);
+        crates[instruction.to - 1].extend(buf);
     }
 
     crates
