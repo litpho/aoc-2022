@@ -1,7 +1,10 @@
 use anyhow::{Error, Result};
 use nom::{
-    character::complete, character::complete::line_ending, combinator::map, multi::separated_list1,
-    sequence::pair, IResult,
+    character::complete::{self, line_ending},
+    combinator::map,
+    multi::separated_list1,
+    sequence::pair,
+    IResult,
 };
 
 fn main() -> Result<()> {

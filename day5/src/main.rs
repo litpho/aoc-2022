@@ -35,8 +35,8 @@ fn part_one(mut crates: Vec<Vec<char>>, instructions: &[Instruction]) -> String 
     }
 
     crates
-        .iter_mut()
-        .map(|cr| cr.pop().unwrap())
+        .iter()
+        .map(|cr| cr.last().unwrap())
         .collect::<String>()
 }
 
@@ -48,8 +48,8 @@ fn part_two(mut crates: Vec<Vec<char>>, instructions: &[Instruction]) -> String 
     }
 
     crates
-        .iter_mut()
-        .map(|cr| cr.pop().unwrap())
+        .iter()
+        .map(|cr| cr.last().unwrap())
         .collect::<String>()
 }
 
