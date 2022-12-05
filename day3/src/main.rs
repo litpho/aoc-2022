@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use anyhow::Result;
 use nom::{
     character::{complete::alpha1, complete::line_ending},
@@ -36,10 +38,8 @@ fn part_two(input: &[&str]) -> u32 {
 }
 
 fn get_sum(a: &str, rest: &[&str]) -> u32 {
-    let mut a_chars = a.chars().collect::<Vec<char>>();
-    a_chars.sort();
-    a_chars.dedup();
-    a_chars
+    a.chars()
+        .collect::<HashSet<char>>()
         .iter()
         .filter(|a_char| rest.iter().all(|r| r.contains(**a_char)))
         .map(|c| get_value(*c))
