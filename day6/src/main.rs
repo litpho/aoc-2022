@@ -5,32 +5,32 @@ fn main() -> Result<()> {
     let input = read_input();
 
     let (took, result) = took::took(|| part_one(input));
-    println!("Result part one: {}", result.expect("No answer found"));
+    println!("Result part one: {result}");
     println!("Time spent: {}", took);
 
     let (took, result) = took::took(|| part_two(input));
-    println!("Result part two: {}", result.expect("No answer found"));
+    println!("Result part two: {result}");
     println!("Time spent: {took}");
 
     Ok(())
 }
 
-fn part_one(input: &str) -> Option<usize> {
+fn part_one(input: &str) -> usize {
     get_marker(input, 4)
 }
 
-fn part_two(input: &str) -> Option<usize> {
+fn part_two(input: &str) -> usize {
     get_marker(input, 14)
 }
-
-fn get_marker(input: &str, size: usize) -> Option<usize> {
-    for (i, chars) in input.as_bytes().windows(size).enumerate() {
-        if !(1..size).any(|i| chars.slice(..i).contains(&chars[i])) {
-            return Some(i + size);
-        }
-    }
-
-    None
+fn get_marker(input: &str, size: usize) -> usize {
+    input
+        .as_bytes()
+        .windows(size)
+        .enumerate()
+        .find(|(_, chars)| !(1..size).any(|i| chars.slice(..i).contains(&chars[i])))
+        .unwrap()
+        .0
+        + size
 }
 
 fn read_input() -> &'static str {
@@ -42,10 +42,18 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test() {
+        let c = 'q';
+        let flag: i32 = 1 << (c as u32 - 'a' as u32);
+        println!("{flag}");
+        println!("{}", flag.count_ones());
+    }
+
+    #[test]
     fn test_part_one() -> Result<()> {
         let input = read_input();
 
-        let result = part_one(input).expect("No answer found");
+        let result = part_one(input);
 
         assert_eq!(1134, result);
 
@@ -56,7 +64,7 @@ mod tests {
     fn test_part_two() -> Result<()> {
         let input = read_input();
 
-        let result = part_two(input).expect("No answer found");
+        let result = part_two(input);
 
         assert_eq!(2263, result);
 
