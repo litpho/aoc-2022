@@ -1,5 +1,4 @@
 use anyhow::Result;
-use nom::Slice;
 
 fn main() -> Result<()> {
     let input = read_input();
@@ -27,7 +26,7 @@ fn get_marker(input: &str, size: usize) -> usize {
     input
         .as_bytes()
         .windows(size)
-        .position(|chars| !(1..size).any(|i| chars.slice(..i).contains(&chars[i])))
+        .position(|chars| !(1..size).any(|i| chars[..i].contains(&chars[i])))
         .unwrap()
         + size
 }
@@ -41,11 +40,12 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test() {
-        let c = 'q';
-        let flag: i32 = 1 << (c as u32 - 'a' as u32);
-        println!("{flag}");
-        println!("{}", flag.count_ones());
+    fn test_part_one_testdata() {
+        assert_eq!(7, part_one("mjqjpqmgbljsphdztnvjfqwrcgsmlb"));
+        assert_eq!(5, part_one("bvwbjplbgvbhsrlpgdmjqwftvncz"));
+        assert_eq!(6, part_one("nppdvjthqldpwncqszvftbrmjlhg"));
+        assert_eq!(10, part_one("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg"));
+        assert_eq!(11, part_one("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"));
     }
 
     #[test]
@@ -57,6 +57,15 @@ mod tests {
         assert_eq!(1134, result);
 
         Ok(())
+    }
+
+    #[test]
+    fn test_part_two_testdata() {
+        assert_eq!(19, part_two("mjqjpqmgbljsphdztnvjfqwrcgsmlb"));
+        assert_eq!(23, part_two("bvwbjplbgvbhsrlpgdmjqwftvncz"));
+        assert_eq!(23, part_two("nppdvjthqldpwncqszvftbrmjlhg"));
+        assert_eq!(29, part_two("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg"));
+        assert_eq!(26, part_two("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"));
     }
 
     #[test]
