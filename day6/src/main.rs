@@ -27,10 +27,8 @@ fn get_marker(input: &str, size: usize) -> usize {
     input
         .as_bytes()
         .windows(size)
-        .enumerate()
-        .find(|(_, chars)| !(1..size).any(|i| chars.slice(..i).contains(&chars[i])))
+        .position(|chars| !(1..size).any(|i| chars.slice(..i).contains(&chars[i])))
         .unwrap()
-        .0
         + size
 }
 
