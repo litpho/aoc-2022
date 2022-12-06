@@ -158,13 +158,30 @@ fn read_input() -> Result<(Vec<Vec<char>>, Vec<Instruction>)> {
 mod tests {
     use super::*;
 
+    fn testdata() -> &'static str {
+        include_str!("test.txt")
+    }
+
+    #[test]
+    fn test_part_one_testdata() -> Result<()> {
+        let (crates, instructions) = parse(testdata())?.1;
+        assert_eq!("CMZ", part_one(crates, &instructions));
+
+        Ok(())
+    }
+
     #[test]
     fn test_part_one() -> Result<()> {
         let (crates, instructions) = read_input()?;
+        assert_eq!("FJSRQCFTN", part_one(crates, &instructions));
 
-        let result = part_one(crates, &instructions);
+        Ok(())
+    }
 
-        assert_eq!("FJSRQCFTN", result);
+    #[test]
+    fn test_part_two_testdata() -> Result<()> {
+        let (crates, instructions) = parse(testdata())?.1;
+        assert_eq!("MCD", part_two(crates, &instructions));
 
         Ok(())
     }
@@ -172,10 +189,7 @@ mod tests {
     #[test]
     fn test_part_two() -> Result<()> {
         let (crates, instructions) = read_input()?;
-
-        let result = part_two(crates, &instructions);
-
-        assert_eq!("CJVLJQPHS", result);
+        assert_eq!("CJVLJQPHS", part_two(crates, &instructions));
 
         Ok(())
     }

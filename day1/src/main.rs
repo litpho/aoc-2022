@@ -55,11 +55,13 @@ fn read_input() -> Result<Vec<u32>> {
 mod tests {
     use super::*;
 
+    fn testdata() -> &'static str {
+        include_str!("test.txt")
+    }
+
     #[test]
     fn test_part_one_testdata() -> Result<()> {
-        let input = include_str!("test.txt");
-
-        assert_eq!(&24000, part_one(&parse(input)?.1)?);
+        assert_eq!(&24000, part_one(&parse(testdata())?.1)?);
 
         Ok(())
     }
@@ -67,19 +69,14 @@ mod tests {
     #[test]
     fn test_part_one() -> Result<()> {
         let input = read_input()?;
-
-        let count = part_one(&input)?;
-
-        assert_eq!(72511, *count);
+        assert_eq!(&72511, part_one(&input)?);
 
         Ok(())
     }
 
     #[test]
     fn test_part_two_testdata() -> Result<()> {
-        let input = include_str!("test.txt");
-
-        assert_eq!(45000, part_two(parse(input)?.1));
+        assert_eq!(45000, part_two(parse(testdata())?.1));
 
         Ok(())
     }
@@ -87,10 +84,7 @@ mod tests {
     #[test]
     fn test_part_two() -> Result<()> {
         let input = read_input()?;
-
-        let count = part_two(input);
-
-        assert_eq!(212117, count);
+        assert_eq!(212117, part_two(input));
 
         Ok(())
     }

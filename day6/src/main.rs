@@ -51,10 +51,7 @@ mod tests {
     #[test]
     fn test_part_one() -> Result<()> {
         let input = read_input();
-
-        let result = part_one(input);
-
-        assert_eq!(1134, result);
+        assert_eq!(1134, part_one(input));
 
         Ok(())
     }
@@ -71,10 +68,7 @@ mod tests {
     #[test]
     fn test_part_two() -> Result<()> {
         let input = read_input();
-
-        let result = part_two(input);
-
-        assert_eq!(2263, result);
+        assert_eq!(2263, part_two(input));
 
         Ok(())
     }
