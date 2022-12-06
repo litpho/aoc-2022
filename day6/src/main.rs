@@ -22,6 +22,7 @@ fn part_one(input: &str) -> usize {
 fn part_two(input: &str) -> usize {
     get_marker(input, 14)
 }
+
 fn get_marker(input: &str, size: usize) -> usize {
     input
         .as_bytes()
