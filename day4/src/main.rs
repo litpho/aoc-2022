@@ -6,14 +6,16 @@ use nom::{
     sequence::separated_pair, IResult,
 };
 
+const DATA: &str = include_str!("input.txt");
+
 fn main() -> Result<()> {
-    let input = read_input()?;
+    let input = parse_input(DATA)?;
 
     let (took, result) = took::took(|| part_one(&input));
     println!("Result part one: {}", result);
     println!("Time spent: {took}");
 
-    let input = read_input()?;
+    let input = parse_input(DATA)?;
     let (took, result) = took::took(|| part_two(&input));
     println!("Result part two: {}", result);
     println!("Time spent: {took}");
@@ -69,10 +71,8 @@ fn parse_range(input: &str) -> IResult<&str, RangeInclusive<u32>> {
     )(input)
 }
 
-fn read_input() -> Result<Vec<AssignmentPair>> {
-    let buf = include_str!("input.txt");
-
-    let (_, input) = parse(buf).expect("Parse failure");
+fn parse_input(input: &'static str) -> Result<Vec<AssignmentPair>> {
+    let (_, input) = parse(input)?;
 
     Ok(input)
 }
@@ -81,20 +81,18 @@ fn read_input() -> Result<Vec<AssignmentPair>> {
 mod tests {
     use super::*;
 
-    fn testdata() -> &'static str {
-        include_str!("test.txt")
-    }
+    const TESTDATA: &str = include_str!("test.txt");
 
     #[test]
     fn test_part_one_testdata() -> Result<()> {
-        assert_eq!(2, part_one(&parse(testdata())?.1));
+        assert_eq!(2, part_one(&parse(TESTDATA)?.1));
 
         Ok(())
     }
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let input = read_input()?;
+        let input = parse_input(DATA)?;
         assert_eq!(515, part_one(&input));
 
         Ok(())
@@ -102,14 +100,14 @@ mod tests {
 
     #[test]
     fn test_part_two_testdata() -> Result<()> {
-        assert_eq!(4, part_two(&parse(testdata())?.1));
+        assert_eq!(4, part_two(&parse(TESTDATA)?.1));
 
         Ok(())
     }
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let input = read_input()?;
+        let input = parse_input(DATA)?;
         assert_eq!(883, part_two(&input));
 
         Ok(())

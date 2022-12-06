@@ -1,7 +1,9 @@
 use anyhow::Result;
 
+const DATA: &str = include_str!("input.txt");
+
 fn main() -> Result<()> {
-    let input = read_input();
+    let input = parse_input(DATA);
 
     let (took, result) = took::took(|| part_one(input));
     println!("Result part one: {result}");
@@ -31,43 +33,44 @@ fn get_marker(input: &str, size: usize) -> usize {
         + size
 }
 
-fn read_input() -> &'static str {
-    include_str!("input.txt")
+fn parse_input(input: &'static str) -> &'static str {
+    input
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use test_case::test_case;
 
-    #[test]
-    fn test_part_one_testdata() {
-        assert_eq!(7, part_one("mjqjpqmgbljsphdztnvjfqwrcgsmlb"));
-        assert_eq!(5, part_one("bvwbjplbgvbhsrlpgdmjqwftvncz"));
-        assert_eq!(6, part_one("nppdvjthqldpwncqszvftbrmjlhg"));
-        assert_eq!(10, part_one("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg"));
-        assert_eq!(11, part_one("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"));
+    #[test_case(7, "mjqjpqmgbljsphdztnvjfqwrcgsmlb")]
+    #[test_case(5, "bvwbjplbgvbhsrlpgdmjqwftvncz")]
+    #[test_case(6, "nppdvjthqldpwncqszvftbrmjlhg")]
+    #[test_case(10, "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg")]
+    #[test_case(11, "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw")]
+    fn test_part_one_testdata(expected: usize, input: &str) {
+        assert_eq!(expected, part_one(input));
     }
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let input = read_input();
+        let input = parse_input(DATA);
         assert_eq!(1134, part_one(input));
 
         Ok(())
     }
 
-    #[test]
-    fn test_part_two_testdata() {
-        assert_eq!(19, part_two("mjqjpqmgbljsphdztnvjfqwrcgsmlb"));
-        assert_eq!(23, part_two("bvwbjplbgvbhsrlpgdmjqwftvncz"));
-        assert_eq!(23, part_two("nppdvjthqldpwncqszvftbrmjlhg"));
-        assert_eq!(29, part_two("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg"));
-        assert_eq!(26, part_two("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"));
+    #[test_case(19, "mjqjpqmgbljsphdztnvjfqwrcgsmlb")]
+    #[test_case(23, "bvwbjplbgvbhsrlpgdmjqwftvncz")]
+    #[test_case(23, "nppdvjthqldpwncqszvftbrmjlhg")]
+    #[test_case(29, "nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg")]
+    #[test_case(26, "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw")]
+    fn test_part_two_testdata(expected: usize, input: &str) {
+        assert_eq!(expected, part_two(input));
     }
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let input = read_input();
+        let input = parse_input(DATA);
         assert_eq!(2263, part_two(input));
 
         Ok(())

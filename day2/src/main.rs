@@ -6,8 +6,10 @@ use nom::{
     IResult,
 };
 
+const DATA: &str = include_str!("input.txt");
+
 fn main() -> Result<()> {
-    let input = read_input()?;
+    let input = parse_input(DATA)?;
 
     let (took, result) = took::took(|| part_one(&input));
     println!("Result part one: {}", result?);
@@ -148,10 +150,8 @@ fn parse_line(input: &str) -> IResult<&str, (char, char)> {
     separated_pair(one_of("ABC"), complete::char(' '), one_of("XYZ"))(input)
 }
 
-fn read_input() -> Result<Vec<(char, char)>> {
-    let buf = include_str!("input.txt");
-
-    let (_, input) = parse(buf).expect("Parse failure");
+fn parse_input(input: &'static str) -> Result<Vec<(char, char)>> {
+    let (_, input) = parse(input)?;
 
     Ok(input)
 }
@@ -160,20 +160,18 @@ fn read_input() -> Result<Vec<(char, char)>> {
 mod tests {
     use super::*;
 
-    fn testdata() -> &'static str {
-        include_str!("test.txt")
-    }
+    const TESTDATA: &str = include_str!("test.txt");
 
     #[test]
     fn test_part_one_testdata() -> Result<()> {
-        assert_eq!(15, part_one(&parse(testdata())?.1)?);
+        assert_eq!(15, part_one(&parse(TESTDATA)?.1)?);
 
         Ok(())
     }
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let input = read_input()?;
+        let input = parse_input(DATA)?;
         assert_eq!(10718, part_one(&input)?);
 
         Ok(())
@@ -181,14 +179,14 @@ mod tests {
 
     #[test]
     fn test_part_two_testdata() -> Result<()> {
-        assert_eq!(12, part_two(&parse(testdata())?.1)?);
+        assert_eq!(12, part_two(&parse(TESTDATA)?.1)?);
 
         Ok(())
     }
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let input = read_input()?;
+        let input = parse_input(DATA)?;
         assert_eq!(14652, part_two(&input)?);
 
         Ok(())

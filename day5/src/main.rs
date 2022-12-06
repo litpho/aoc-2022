@@ -10,14 +10,16 @@ use nom::sequence::pair;
 use nom::sequence::{delimited, preceded, separated_pair, terminated, tuple};
 use nom::IResult;
 
+const DATA: &str = include_str!("input.txt");
+
 fn main() -> Result<()> {
-    let (crates, instructions) = read_input()?;
+    let (crates, instructions) = parse_input(DATA)?;
 
     let (took, result) = took::took(|| part_one(crates, &instructions));
     println!("Result part one: {}", result);
     println!("Time spent: {}", took);
 
-    let (crates, instructions) = read_input()?;
+    let (crates, instructions) = parse_input(DATA)?;
 
     let (took, result) = took::took(|| part_two(crates, &instructions));
     println!("Result part two: {result}");
@@ -146,10 +148,8 @@ fn parse_crate(input: &str) -> IResult<&str, char> {
     )(input)
 }
 
-fn read_input() -> Result<(Vec<Vec<char>>, Vec<Instruction>)> {
-    let buf = include_str!("input.txt");
-
-    let (_, input) = parse(buf).expect("Parse failure");
+fn parse_input(input: &'static str) -> Result<(Vec<Vec<char>>, Vec<Instruction>)> {
+    let (_, input) = parse(input)?;
 
     Ok(input)
 }
@@ -158,13 +158,11 @@ fn read_input() -> Result<(Vec<Vec<char>>, Vec<Instruction>)> {
 mod tests {
     use super::*;
 
-    fn testdata() -> &'static str {
-        include_str!("test.txt")
-    }
+    const TESTDATA: &str = include_str!("test.txt");
 
     #[test]
     fn test_part_one_testdata() -> Result<()> {
-        let (crates, instructions) = parse(testdata())?.1;
+        let (crates, instructions) = parse(TESTDATA)?.1;
         assert_eq!("CMZ", part_one(crates, &instructions));
 
         Ok(())
@@ -172,7 +170,7 @@ mod tests {
 
     #[test]
     fn test_part_one() -> Result<()> {
-        let (crates, instructions) = read_input()?;
+        let (crates, instructions) = parse_input(DATA)?;
         assert_eq!("FJSRQCFTN", part_one(crates, &instructions));
 
         Ok(())
@@ -180,7 +178,7 @@ mod tests {
 
     #[test]
     fn test_part_two_testdata() -> Result<()> {
-        let (crates, instructions) = parse(testdata())?.1;
+        let (crates, instructions) = parse(TESTDATA)?.1;
         assert_eq!("MCD", part_two(crates, &instructions));
 
         Ok(())
@@ -188,7 +186,7 @@ mod tests {
 
     #[test]
     fn test_part_two() -> Result<()> {
-        let (crates, instructions) = read_input()?;
+        let (crates, instructions) = parse_input(DATA)?;
         assert_eq!("CJVLJQPHS", part_two(crates, &instructions));
 
         Ok(())
