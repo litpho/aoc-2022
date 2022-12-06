@@ -56,12 +56,30 @@ mod tests {
     use super::*;
 
     #[test]
+    fn test_part_one_testdata() -> Result<()> {
+        let input = include_str!("test.txt");
+
+        assert_eq!(&24000, part_one(&parse(input)?.1)?);
+
+        Ok(())
+    }
+
+    #[test]
     fn test_part_one() -> Result<()> {
         let input = read_input()?;
 
         let count = part_one(&input)?;
 
         assert_eq!(72511, *count);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_part_two_testdata() -> Result<()> {
+        let input = include_str!("test.txt");
+
+        assert_eq!(45000, part_two(parse(input)?.1));
 
         Ok(())
     }
