@@ -1,14 +1,13 @@
 use anyhow::Result;
-use nom::branch::alt;
-use nom::bytes::complete::tag;
-use nom::character::complete;
-use nom::character::complete::line_ending;
-use nom::character::complete::{one_of, space0, space1};
-use nom::combinator::map;
-use nom::multi::separated_list1;
-use nom::sequence::pair;
-use nom::sequence::{delimited, preceded, separated_pair, terminated, tuple};
-use nom::IResult;
+use nom::{
+    branch::alt,
+    bytes::complete::tag,
+    character::complete::{self, line_ending, one_of, space0, space1},
+    combinator::map,
+    multi::separated_list1,
+    sequence::{delimited, pair, preceded, separated_pair, terminated, tuple},
+    IResult,
+};
 
 const DATA: &str = include_str!("input.txt");
 
@@ -62,6 +61,16 @@ struct Instruction {
     pub to: usize,
 }
 
+impl From<(u8, u8, u8)> for Instruction {
+    fn from(tuple: (u8, u8, u8)) -> Self {
+        Instruction {
+            amount: tuple.0 as usize,
+            from: tuple.1 as usize,
+            to: tuple.2 as usize,
+        }
+    }
+}
+
 fn parse(input: &str) -> IResult<&str, (Vec<Vec<char>>, Vec<Instruction>)> {
     separated_pair(
         parse_crates,
@@ -77,35 +86,30 @@ fn parse_instructions(input: &str) -> IResult<&str, Vec<Instruction>> {
 fn parse_instruction(input: &str) -> IResult<&str, Instruction> {
     map(
         tuple((
-            tag("move "),
-            complete::u8,
-            tag(" from "),
-            complete::u8,
-            tag(" to "),
-            complete::u8,
+            preceded(tag("move "), complete::u8),
+            preceded(tag(" from "), complete::u8),
+            preceded(tag(" to "), complete::u8),
         )),
-        |(_, amount, _, from, _, to)| Instruction {
-            amount: amount as usize,
-            from: from as usize,
-            to: to as usize,
-        },
+        Instruction::from,
     )(input)
 }
 
 fn parse_crates(input: &str) -> IResult<&str, Vec<Vec<char>>> {
-    map(parse_crate_lines, |mut lines| {
-        let mut output: Vec<Vec<char>> = vec![];
-        lines.reverse();
-        lines[0].iter().for_each(|_| output.push(vec![]));
-        lines.iter().for_each(|line| {
-            line.iter().enumerate().for_each(|(i, cr)| {
-                if let Some(c) = cr {
-                    output[i].push(*c);
-                }
-            })
-        });
-        output
-    })(input)
+    map(parse_crate_lines, transpose)(input)
+}
+
+fn transpose(lines: Vec<Vec<Option<char>>>) -> Vec<Vec<char>> {
+    let mut output = (0..lines.last().unwrap().len())
+        .map(|_| vec![])
+        .collect::<Vec<Vec<char>>>();
+    lines.iter().rev().for_each(|line| {
+        line.iter().enumerate().for_each(|(i, cr)| {
+            if let Some(c) = cr {
+                output[i].push(*c);
+            }
+        })
+    });
+    output
 }
 
 fn parse_crate_lines(input: &str) -> IResult<&str, Vec<Vec<Option<char>>>> {
