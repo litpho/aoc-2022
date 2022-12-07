@@ -8,9 +8,9 @@ use nom::{
         complete::{self, alpha1, line_ending},
         is_alphabetic,
     },
-    combinator::map,
+    combinator::{map, value},
     multi::separated_list1,
-    sequence::{pair, preceded, separated_pair},
+    sequence::{pair, preceded, terminated},
     IResult,
 };
 
@@ -57,7 +57,7 @@ enum Command {
     Ls(Vec<File>),
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 enum LsLine {
     Dir,
     File(u32),
@@ -72,10 +72,10 @@ fn parse_command(input: &str) -> IResult<&str, Command> {
 }
 
 fn parse_ls(input: &str) -> IResult<&str, Command> {
-    preceded(pair(tag("$ ls"), line_ending), parse_ls_line)(input)
+    preceded(pair(tag("$ ls"), line_ending), parse_ls_lines)(input)
 }
 
-fn parse_ls_line(input: &str) -> IResult<&str, Command> {
+fn parse_ls_lines(input: &str) -> IResult<&str, Command> {
     map(
         separated_list1(line_ending, alt((parse_ls_dir_line, parse_ls_file_line))),
         |ls_lines| {
@@ -95,17 +95,19 @@ fn parse_ls_line(input: &str) -> IResult<&str, Command> {
 }
 
 fn parse_ls_dir_line(input: &str) -> IResult<&str, LsLine> {
-    map(preceded(tag("dir "), alpha1), |_| LsLine::Dir)(input)
+    value(LsLine::Dir, preceded(tag("dir "), alpha1))(input)
 }
 
 fn parse_ls_file_line(input: &str) -> IResult<&str, LsLine> {
     map(
-        separated_pair(
+        terminated(
             complete::u32,
-            complete::char(' '),
-            take_while1(|c| is_alphabetic(c as u8) || c == '.'),
+            pair(
+                complete::char(' '),
+                take_while1(|c| is_alphabetic(c as u8) || c == '.'),
+            ),
         ),
-        |(size, _)| LsLine::File(size),
+        LsLine::File,
     )(input)
 }
 
