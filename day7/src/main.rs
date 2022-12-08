@@ -19,7 +19,9 @@ const TOTAL_SIZE: u32 = 70_000_000;
 const MINIMUM_NEEDED: u32 = 30_000_000;
 
 fn main() -> Result<()> {
-    let input = parse_input(DATA)?;
+    let (took, result) = took::took(|| parse_input(DATA));
+    println!("Time spent parsing: {}", took);
+    let input = result?;
 
     let (took, result) = took::took(|| part_one(&input));
     println!("Result part one: {result}");

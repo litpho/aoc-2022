@@ -9,13 +9,18 @@ use nom::{
 const DATA: &str = include_str!("input.txt");
 
 fn main() -> Result<()> {
-    let input = parse_input(DATA)?;
+    let (took, result) = took::took(|| parse_input(DATA));
+    println!("Time spent parsing: {}", took);
+    let input = result?;
 
     let (took, result) = took::took(|| part_one(&input));
     println!("Result part one: {}", result);
     println!("Time spent: {took}");
 
-    let input = parse_input(DATA)?;
+    let (took, result) = took::took(|| parse_input(DATA));
+    println!("Time spent parsing: {}", took);
+    let input = result?;
+
     let (took, result) = took::took(|| part_two(&input));
     println!("Result part two: {}", result);
     println!("Time spent: {took}");

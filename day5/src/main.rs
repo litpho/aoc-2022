@@ -12,13 +12,17 @@ use nom::{
 const DATA: &str = include_str!("input.txt");
 
 fn main() -> Result<()> {
-    let (crates, instructions) = parse_input(DATA)?;
+    let (took, result) = took::took(|| parse_input(DATA));
+    println!("Time spent parsing: {}", took);
+    let (crates, instructions) = result?;
 
     let (took, result) = took::took(|| part_one(crates, &instructions));
     println!("Result part one: {}", result);
     println!("Time spent: {}", took);
 
-    let (crates, instructions) = parse_input(DATA)?;
+    let (took, result) = took::took(|| parse_input(DATA));
+    println!("Time spent parsing: {}", took);
+    let (crates, instructions) = result?;
 
     let (took, result) = took::took(|| part_two(crates, &instructions));
     println!("Result part two: {result}");
@@ -114,7 +118,7 @@ fn transpose(lines: Vec<Vec<Option<char>>>) -> Vec<Vec<char>> {
 
 fn parse_crate_lines(input: &str) -> IResult<&str, Vec<Vec<Option<char>>>> {
     terminated(
-        separated_list1(line_ending, parse_crate_line),
+        separated_list1(line_ending, terminated(parse_crate_line, space0)),
         pair(line_ending, parse_index_line),
     )(input)
 }

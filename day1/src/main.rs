@@ -10,7 +10,9 @@ use nom::{
 const DATA: &str = include_str!("input.txt");
 
 fn main() -> Result<()> {
-    let input = parse_input(DATA)?;
+    let (took, result) = took::took(|| parse_input(DATA));
+    println!("Time spent parsing: {}", took);
+    let input = result?;
 
     let (took, result) = took::took(|| part_one(&input));
     println!("Result part one: {}", result?);
@@ -55,7 +57,7 @@ fn parse_input(input: &'static str) -> Result<Vec<u32>> {
 mod tests {
     use super::*;
 
-    const TESTDATA: &'static str = include_str!("test.txt");
+    const TESTDATA: &str = include_str!("test.txt");
 
     #[test]
     fn test_part_one_testdata() -> Result<()> {

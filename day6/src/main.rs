@@ -3,7 +3,8 @@ use anyhow::Result;
 const DATA: &str = include_str!("input.txt");
 
 fn main() -> Result<()> {
-    let input = parse_input(DATA);
+    let (took, input) = took::took(|| parse_input(DATA));
+    println!("Time spent parsing: {}", took);
 
     let (took, result) = took::took(|| part_one(input));
     println!("Result part one: {result}");
