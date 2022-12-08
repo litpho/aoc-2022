@@ -23,59 +23,63 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn part_one(input: &[Vec<u8>]) -> u32 {
-    let mut count: u32 = 0;
-    for (y, row) in input.iter().enumerate() {
-        for (x, height) in row.iter().enumerate() {
-            if visible_from_left(x, height, row)
-                || visible_from_right(x, height, row)
-                || visible_from_top(x, y, height, input)
-                || visible_from_bottom(x, y, height, input)
-            {
-                count += 1;
-            }
-        }
-    }
-    count
+fn part_one(input: &[Vec<u8>]) -> usize {
+    input
+        .iter()
+        .enumerate()
+        .flat_map(|(y, row)| {
+            row.iter().enumerate().filter_map(move |(x, height)| {
+                if visible_from_left(x, height, row)
+                    || visible_from_right(x, height, row)
+                    || visible_from_top(x, y, height, input)
+                    || visible_from_bottom(x, y, height, input)
+                {
+                    Some(())
+                } else {
+                    None
+                }
+            })
+        })
+        .count()
 }
 
 fn part_two(input: &[Vec<u8>]) -> u32 {
-    let mut scenic_max: u32 = 0;
-    for (y, row) in input.iter().enumerate() {
-        for (x, height) in row.iter().enumerate() {
-            let scenic = scenic_to_left(x, height, row)
-                * scenic_to_right(x, height, row)
-                * scenic_to_top(x, y, height, input)
-                * scenic_to_bottom(x, y, height, input);
-            if scenic > scenic_max {
-                scenic_max = scenic
-            }
-        }
-    }
-    scenic_max
+    input
+        .iter()
+        .enumerate()
+        .flat_map(|(y, row)| {
+            row.iter().enumerate().map(move |(x, height)| {
+                scenic_to_left(x, height, row)
+                    * scenic_to_right(x, height, row)
+                    * scenic_to_top(x, y, height, input)
+                    * scenic_to_bottom(x, y, height, input)
+            })
+        })
+        .max()
+        .unwrap()
 }
 
 fn visible_from_left(x: usize, height: &u8, row: &[u8]) -> bool {
-    x == 0 || !(0..x).any(|x| row.get(x).unwrap() >= height)
+    x == 0 || !(0..x).any(|x| row[x] >= *height)
 }
 
 fn visible_from_right(x: usize, height: &u8, row: &[u8]) -> bool {
     let max_x = row.len();
-    x == max_x - 1 || !(x + 1..max_x).any(|x| row.get(x).unwrap() >= height)
+    x == max_x - 1 || !(x + 1..max_x).any(|x| row[x] >= *height)
 }
 
 fn visible_from_top(x: usize, y: usize, height: &u8, input: &[Vec<u8>]) -> bool {
-    y == 0 || !(0..y).any(|y| input.get(y).unwrap().get(x).unwrap() >= height)
+    y == 0 || !(0..y).any(|y| input[y][x] >= *height)
 }
 
 fn visible_from_bottom(x: usize, y: usize, height: &u8, input: &[Vec<u8>]) -> bool {
     let max_y = input.len();
-    y == max_y - 1 || !(y + 1..max_y).any(|y| input.get(y).unwrap().get(x).unwrap() >= height)
+    y == max_y - 1 || !(y + 1..max_y).any(|y| input[y][x] >= *height)
 }
 
 fn scenic_to_left(x: usize, height: &u8, row: &[u8]) -> u32 {
     for (count, x) in (0..x).rev().into_iter().enumerate() {
-        if row.get(x).unwrap() >= height {
+        if row[x] >= *height {
             return (count + 1) as u32;
         }
     }
@@ -85,7 +89,7 @@ fn scenic_to_left(x: usize, height: &u8, row: &[u8]) -> u32 {
 fn scenic_to_right(x: usize, height: &u8, row: &[u8]) -> u32 {
     let max_x = row.len();
     for (count, x) in (x + 1..max_x).into_iter().enumerate() {
-        if row.get(x).unwrap() >= height {
+        if row[x] >= *height {
             return (count + 1) as u32;
         }
     }
@@ -94,7 +98,7 @@ fn scenic_to_right(x: usize, height: &u8, row: &[u8]) -> u32 {
 
 fn scenic_to_top(x: usize, y: usize, height: &u8, input: &[Vec<u8>]) -> u32 {
     for (count, y) in (0..y).into_iter().rev().enumerate() {
-        if input.get(y).unwrap().get(x).unwrap() >= height {
+        if input[y][x] >= *height {
             return (count + 1) as u32;
         }
     }
@@ -104,7 +108,7 @@ fn scenic_to_top(x: usize, y: usize, height: &u8, input: &[Vec<u8>]) -> u32 {
 fn scenic_to_bottom(x: usize, y: usize, height: &u8, input: &[Vec<u8>]) -> u32 {
     let max_y = input.len();
     for (count, y) in (y + 1..max_y).into_iter().enumerate() {
-        if input.get(y).unwrap().get(x).unwrap() >= height {
+        if input[y][x] >= *height {
             return (count + 1) as u32;
         }
     }
