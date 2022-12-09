@@ -1,4 +1,4 @@
-use std::{cmp::Ordering, collections::HashSet};
+use std::collections::HashSet;
 
 use anyhow::{Error, Result};
 use nom::{
@@ -80,20 +80,9 @@ fn move_body(body: &mut [(isize, isize)]) -> (isize, isize) {
 }
 
 fn move_segment(mut next: (isize, isize), previous: &(isize, isize)) -> (isize, isize) {
-    if previous.0.abs_diff(next.0) <= 1 && previous.1.abs_diff(next.1) <= 1 {
-        return next;
-    }
-
-    match previous.0.cmp(&next.0) {
-        Ordering::Greater => next.0 += 1,
-        Ordering::Less => next.0 -= 1,
-        Ordering::Equal => {}
-    }
-
-    match previous.1.cmp(&next.1) {
-        Ordering::Greater => next.1 += 1,
-        Ordering::Less => next.1 -= 1,
-        Ordering::Equal => {}
+    if previous.0.abs_diff(next.0) > 1 || previous.1.abs_diff(next.1) > 1 {
+        next.0 += (previous.0 - next.0).signum();
+        next.1 += (previous.1 - next.1).signum();
     }
 
     next
