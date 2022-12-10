@@ -31,26 +31,12 @@ fn main() -> Result<()> {
 fn part_one(input: &[Instruction]) -> i32 {
     let state = calculate_state(input);
 
-    let mut keys = state.keys().into_iter().copied().collect::<Vec<usize>>();
-    keys.sort();
-
-    for i in keys {
-        println!("{i}: {}", state.get(&i).unwrap());
-    }
-
-    println!("20: {}", get_closest(&state, 20));
-    println!("60: {}", get_closest(&state, 60));
-    println!("100: {}", get_closest(&state, 100));
-    println!("140: {}", get_closest(&state, 140));
-    println!("180: {}", get_closest(&state, 180));
-    println!("220: {}", get_closest(&state, 220));
-
-    20 * get_closest(&state, 20)
-        + 60 * get_closest(&state, 60)
-        + 100 * get_closest(&state, 100)
-        + 140 * get_closest(&state, 140)
-        + 180 * get_closest(&state, 180)
-        + 220 * get_closest(&state, 220)
+    20 * state.get(&19).unwrap()
+        + 60 * state.get(&59).unwrap()
+        + 100 * state.get(&99).unwrap()
+        + 140 * state.get(&139).unwrap()
+        + 180 * state.get(&179).unwrap()
+        + 220 * state.get(&219).unwrap()
 }
 
 fn part_two(input: &[Instruction]) -> Vec<usize> {
@@ -60,15 +46,23 @@ fn part_two(input: &[Instruction]) -> Vec<usize> {
 
     for (cycle, item) in result.iter_mut().enumerate().skip(1) {
         if let Some(new_sprite_x) = state.get(&(cycle - 1)) {
-            println!("Move sprite to {}", new_sprite_x);
             sprite = *new_sprite_x;
         }
         if sprite.abs_diff(((cycle - 1) as i32).rem(40)) <= 1 {
-            println!("Draw {cycle}");
             *item = true;
         }
     }
 
+    visualize(&result);
+
+    result
+        .into_iter()
+        .enumerate()
+        .filter_map(|(i, b)| if b { Some(i) } else { None })
+        .collect::<Vec<usize>>()
+}
+
+fn visualize(result: &[bool; 241]) {
     for y in 0..6 {
         for x in 0..40 {
             if result[y * 40 + x + 1] {
@@ -79,40 +73,21 @@ fn part_two(input: &[Instruction]) -> Vec<usize> {
         }
         println!();
     }
-
-    result
-        .into_iter()
-        .enumerate()
-        .filter_map(|(i, b)| if b { Some(i) } else { None })
-        .collect::<Vec<usize>>()
 }
 
 fn calculate_state(input: &[Instruction]) -> HashMap<usize, i32> {
-    let mut cycle: usize = 0;
     let mut x: i32 = 1;
     let mut state: HashMap<usize, i32> = HashMap::new();
-    state.insert(0, x);
-    for instruction in input.iter() {
+    for (cycle, instruction) in input.iter().enumerate() {
         match instruction {
             Instruction::AddX(amount) => {
-                cycle += 2;
                 x += *amount;
             }
-            Instruction::Noop => {
-                cycle += 1;
-            }
+            Instruction::Noop => {}
         }
-        state.insert(cycle, x);
+        state.insert(cycle + 1, x);
     }
     state
-}
-
-fn get_closest(input: &HashMap<usize, i32>, index: usize) -> i32 {
-    if let Some(x) = input.get(&(index - 1)) {
-        return *x;
-    }
-
-    *input.get(&(index - 2)).unwrap()
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -121,24 +96,30 @@ enum Instruction {
     Noop,
 }
 
-fn parse(input: &str) -> IResult<&str, Vec<Instruction>> {
+fn parse(input: &str) -> IResult<&str, Vec<Vec<Instruction>>> {
     separated_list1(line_ending, parse_line)(input)
 }
 
-fn parse_line(input: &str) -> IResult<&str, Instruction> {
+fn parse_line(input: &str) -> IResult<&str, Vec<Instruction>> {
     alt((parse_addx, parse_noop))(input)
 }
 
-fn parse_addx(input: &str) -> IResult<&str, Instruction> {
-    map(preceded(tag("addx "), complete::i32), Instruction::AddX)(input)
+fn parse_addx(input: &str) -> IResult<&str, Vec<Instruction>> {
+    map(preceded(tag("addx "), complete::i32), |amount| {
+        vec![Instruction::Noop, Instruction::AddX(amount)]
+    })(input)
 }
 
-fn parse_noop(input: &str) -> IResult<&str, Instruction> {
-    value(Instruction::Noop, tag("noop"))(input)
+fn parse_noop(input: &str) -> IResult<&str, Vec<Instruction>> {
+    value(vec![Instruction::Noop], tag("noop"))(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<Instruction>> {
     let (_, input) = parse(input)?;
+    let input = input
+        .into_iter()
+        .flat_map(|a| a.into_iter())
+        .collect::<Vec<Instruction>>();
 
     Ok(input)
 }
@@ -150,7 +131,6 @@ mod tests {
     const TESTDATA: &str = include_str!("test.txt");
 
     #[test]
-    #[ignore]
     fn test_part_one_testdata() -> Result<()> {
         assert_eq!(13140, part_one(&parse_input(TESTDATA)?));
 
@@ -158,7 +138,6 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn test_part_one() -> Result<()> {
         assert_eq!(15260, part_one(&parse_input(DATA)?));
 
