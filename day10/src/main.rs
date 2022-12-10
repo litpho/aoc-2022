@@ -8,8 +8,7 @@ use nom::{
     sequence::preceded,
     IResult,
 };
-use std::collections::HashMap;
-use std::ops::Rem;
+use std::{collections::HashMap, ops::Rem};
 
 const DATA: &str = include_str!("input.txt");
 
@@ -79,11 +78,8 @@ fn calculate_state(input: &[Instruction]) -> HashMap<usize, i32> {
     let mut x: i32 = 1;
     let mut state: HashMap<usize, i32> = HashMap::new();
     for (cycle, instruction) in input.iter().enumerate() {
-        match instruction {
-            Instruction::AddX(amount) => {
-                x += *amount;
-            }
-            Instruction::Noop => {}
+        if let Instruction::AddX(amount) = instruction {
+            x += *amount;
         }
         state.insert(cycle + 1, x);
     }
