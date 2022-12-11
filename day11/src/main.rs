@@ -112,7 +112,7 @@ impl Monkey {
 enum Operation {
     Addition(u64),
     Multiplication(u64),
-    SelfMultiplication,
+    Squared,
 }
 
 impl Operation {
@@ -120,7 +120,7 @@ impl Operation {
         match self {
             Operation::Addition(x) => x + operand,
             Operation::Multiplication(x) => x * operand,
-            Operation::SelfMultiplication => operand * operand,
+            Operation::Squared => operand * operand,
         }
     }
 }
@@ -191,7 +191,7 @@ fn parse_multiplication(input: &str) -> IResult<&str, Operation> {
 }
 
 fn parse_self_multiplication(input: &str) -> IResult<&str, Operation> {
-    value(Operation::SelfMultiplication, tag("* old"))(input)
+    value(Operation::Squared, tag("* old"))(input)
 }
 
 fn parse_test_div_line(input: &str) -> IResult<&str, u64> {
