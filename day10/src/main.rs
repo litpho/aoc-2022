@@ -65,9 +65,9 @@ fn visualize(result: &[bool; 241]) {
     for y in 0..6 {
         for x in 0..40 {
             if result[y * 40 + x + 1] {
-                print!("#");
+                print!("▓");
             } else {
-                print!(".");
+                print!("░");
             }
         }
         println!();
