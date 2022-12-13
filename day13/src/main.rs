@@ -1,10 +1,9 @@
 use anyhow::Result;
 use nom::branch::alt;
-use nom::bytes::complete::tag;
 use nom::character::complete;
 use nom::character::complete::line_ending;
 use nom::combinator::map;
-use nom::multi::separated_list1;
+use nom::multi::{separated_list0, separated_list1};
 use nom::sequence::{delimited, pair, separated_pair};
 use nom::IResult;
 use std::cmp::Ordering;
@@ -90,27 +89,22 @@ fn parse(input: &str) -> IResult<&str, Vec<(Node, Node)>> {
 }
 
 fn parse_pair(input: &str) -> IResult<&str, (Node, Node)> {
-    separated_pair(parse_tuple, line_ending, parse_tuple)(input)
+    separated_pair(parse_line, line_ending, parse_line)(input)
 }
 
-fn parse_tuple(input: &str) -> IResult<&str, Node> {
-    map(alt((parse_empty, parse_non_empty)), Node::Nodes)(input)
-}
-
-fn parse_non_empty(input: &str) -> IResult<&str, Vec<Node>> {
-    delimited(
-        complete::char('['),
-        separated_list1(complete::char(','), parse_value),
-        complete::char(']'),
+fn parse_line(input: &str) -> IResult<&str, Node> {
+    map(
+        delimited(
+            complete::char('['),
+            separated_list0(complete::char(','), parse_value),
+            complete::char(']'),
+        ),
+        Node::Nodes,
     )(input)
 }
 
-fn parse_empty(input: &str) -> IResult<&str, Vec<Node>> {
-    map(tag("[]"), |_| vec![Node::Nodes(vec![])])(input)
-}
-
 fn parse_value(input: &str) -> IResult<&str, Node> {
-    alt((parse_tuple, map(complete::u8, Node::Value)))(input)
+    alt((parse_line, map(complete::u8, Node::Value)))(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<(Node, Node)>> {
