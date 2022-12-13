@@ -10,6 +10,3 @@ anyhow = "1"
 nom = "7"
 pathfinding = "4"
 took = "0.1"
-
-[dev-dependencies]
-test-case = "2.2.2"
