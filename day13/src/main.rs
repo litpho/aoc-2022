@@ -31,10 +31,7 @@ fn part_one(input: &[(Node, Node)]) -> usize {
         .iter()
         .enumerate()
         .filter(|(_, (left, right))| left <= right)
-        .map(|(i, _)| {
-            println!("{} is right", i + 1);
-            i + 1
-        })
+        .map(|(i, _)| i + 1)
         .sum()
 }
 
@@ -93,29 +90,27 @@ fn parse(input: &str) -> IResult<&str, Vec<(Node, Node)>> {
 }
 
 fn parse_pair(input: &str) -> IResult<&str, (Node, Node)> {
-    separated_pair(parse_tuple(0), line_ending, parse_tuple(0))(input)
+    separated_pair(parse_tuple, line_ending, parse_tuple)(input)
 }
 
-fn parse_tuple(depth: isize) -> impl Fn(&str) -> IResult<&str, Node> {
-    move |input: &str| map(alt((parse_empty, parse_non_empty(depth))), Node::Nodes)(input)
+fn parse_tuple(input: &str) -> IResult<&str, Node> {
+    map(alt((parse_empty, parse_non_empty)), Node::Nodes)(input)
 }
 
-fn parse_non_empty(depth: isize) -> impl Fn(&str) -> IResult<&str, Vec<Node>> {
-    move |input: &str| {
-        delimited(
-            complete::char('['),
-            separated_list1(complete::char(','), parse_value(depth)),
-            complete::char(']'),
-        )(input)
-    }
+fn parse_non_empty(input: &str) -> IResult<&str, Vec<Node>> {
+    delimited(
+        complete::char('['),
+        separated_list1(complete::char(','), parse_value),
+        complete::char(']'),
+    )(input)
 }
 
 fn parse_empty(input: &str) -> IResult<&str, Vec<Node>> {
     map(tag("[]"), |_| vec![Node::Nodes(vec![])])(input)
 }
 
-fn parse_value(depth: isize) -> impl Fn(&str) -> IResult<&str, Node> {
-    move |input: &str| alt((parse_tuple(depth + 1), map(complete::u8, Node::Value)))(input)
+fn parse_value(input: &str) -> IResult<&str, Node> {
+    alt((parse_tuple, map(complete::u8, Node::Value)))(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<(Node, Node)>> {
