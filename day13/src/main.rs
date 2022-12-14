@@ -1,12 +1,14 @@
-use anyhow::Result;
-use nom::branch::alt;
-use nom::character::complete;
-use nom::character::complete::line_ending;
-use nom::combinator::map;
-use nom::multi::{separated_list0, separated_list1};
-use nom::sequence::{delimited, pair, separated_pair};
-use nom::IResult;
 use std::cmp::Ordering;
+
+use anyhow::Result;
+use nom::{
+    branch::alt,
+    character::complete::{self, line_ending},
+    combinator::map,
+    multi::{separated_list0, separated_list1},
+    sequence::{delimited, pair, separated_pair},
+    IResult,
+};
 
 const DATA: &str = include_str!("input.txt");
 
