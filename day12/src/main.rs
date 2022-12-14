@@ -71,29 +71,31 @@ impl Coord {
         let mut next_steps = vec![];
 
         // up
-        self.calculate_step(&mut next_steps, input, |s| s.1 > 0, self.0, self.1 - 1);
+        self.calculate_step(&mut next_steps, input, |s| s.1 > 0, |s| s, |s| s - 1);
         // down
-        self.calculate_step(&mut next_steps, input, |s| s.1 < height, self.0, self.1 + 1);
+        self.calculate_step(&mut next_steps, input, |s| s.1 < height, |s| s, |s| s + 1);
         // left
-        self.calculate_step(&mut next_steps, input, |s| s.0 > 0, self.0 - 1, self.1);
+        self.calculate_step(&mut next_steps, input, |s| s.0 > 0, |s| s - 1, |s| s);
         // right
-        self.calculate_step(&mut next_steps, input, |s| s.0 < width, self.0 + 1, self.1);
+        self.calculate_step(&mut next_steps, input, |s| s.0 < width, |s| s + 1, |s| s);
 
         next_steps
     }
 
-    fn calculate_step<F>(
+    fn calculate_step<F, G, H>(
         &self,
         next_steps: &mut Vec<Coord>,
         input: &[Vec<u8>],
         expr: F,
-        x: usize,
-        y: usize,
+        x: G,
+        y: H,
     ) where
         F: Fn(&Coord) -> bool,
+        G: Fn(usize) -> usize,
+        H: Fn(usize) -> usize,
     {
         if expr(self) {
-            let new_coord = Coord(x, y);
+            let new_coord = Coord(x(self.0), y(self.1));
             let current_height = get_height(input, self);
             let new_height = get_height(input, &new_coord);
             if Self::can_move(current_height, new_height) {
