@@ -48,19 +48,10 @@ fn part_two(input: &[(Node, Node)]) -> usize {
 
     nodes.sort();
 
-    let indexes = nodes
-        .iter()
-        .enumerate()
-        .filter_map(|(i, node)| {
-            if node == &first_divider || node == &second_divider {
-                Some(i + 1)
-            } else {
-                None
-            }
-        })
-        .collect::<Vec<usize>>();
+    let one = nodes.binary_search(&first_divider).unwrap();
+    let two = nodes.binary_search(&second_divider).unwrap();
 
-    indexes[0] * indexes[1]
+    one * two
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
