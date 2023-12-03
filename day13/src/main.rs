@@ -48,8 +48,8 @@ fn part_two(input: &[(Node, Node)]) -> usize {
 
     nodes.sort();
 
-    let one = nodes.binary_search(&first_divider).unwrap();
-    let two = nodes.binary_search(&second_divider).unwrap();
+    let one = nodes.binary_search(&first_divider).unwrap() + 1;
+    let two = nodes.binary_search(&second_divider).unwrap() + 1;
 
     one * two
 }
