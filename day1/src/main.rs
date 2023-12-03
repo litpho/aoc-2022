@@ -34,7 +34,7 @@ fn part_one(input: &[u32]) -> Result<&u32> {
 
 fn part_two(mut input: Vec<u32>) -> u32 {
     input.sort_by(|a, b| b.cmp(a));
-    input[0..3].iter().sum()
+    input[..3].iter().sum()
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<u32>> {

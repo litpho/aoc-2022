@@ -10,4 +10,4 @@ anyhow = "1"
 took = "0.1"
 
 [dev-dependencies]
-test-case = "2.2.2"
+test-case = "3"

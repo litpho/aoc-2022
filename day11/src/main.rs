@@ -53,7 +53,7 @@ where
             let mut items_thrown: HashMap<usize, Vec<u64>> = HashMap::new();
             for item in monkey.items.iter() {
                 *inspections.entry(monkey.id).or_default() += 1;
-                let worry_level = monkey.operation.apply(*item as u64);
+                let worry_level = monkey.operation.apply(*item);
                 let worry_level = worry_modifier(worry_level);
                 let target_monkey = if worry_level.rem(monkey.test_div) == 0 {
                     monkey.target_true
