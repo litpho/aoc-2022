@@ -1,18 +1,14 @@
-use std::{collections::HashMap, ops::AddAssign};
-
 use anyhow::Result;
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_while1},
-    character::{
-        complete::{self, alpha1, line_ending},
-        is_alphabetic,
-    },
+    character::complete::{self, alpha1, line_ending},
     combinator::{map, value},
     multi::separated_list1,
     sequence::{pair, preceded, terminated},
-    IResult,
+    IResult, Parser,
 };
+use std::{collections::HashMap, ops::AddAssign};
 
 const DATA: &str = include_str!("input.txt");
 const TOTAL_SIZE: u32 = 70_000_000;
@@ -66,15 +62,15 @@ enum LsLine {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<Command>> {
-    separated_list1(line_ending, parse_command)(input)
+    separated_list1(line_ending, parse_command).parse(input)
 }
 
 fn parse_command(input: &str) -> IResult<&str, Command> {
-    alt((parse_cd, parse_ls))(input)
+    alt((parse_cd, parse_ls)).parse(input)
 }
 
 fn parse_ls(input: &str) -> IResult<&str, Command> {
-    preceded(pair(tag("$ ls"), line_ending), parse_ls_lines)(input)
+    preceded(pair(tag("$ ls"), line_ending), parse_ls_lines).parse(input)
 }
 
 fn parse_ls_lines(input: &str) -> IResult<&str, Command> {
@@ -93,11 +89,12 @@ fn parse_ls_lines(input: &str) -> IResult<&str, Command> {
                 .collect::<Vec<File>>();
             Command::Ls(files)
         },
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_ls_dir_line(input: &str) -> IResult<&str, LsLine> {
-    value(LsLine::Dir, preceded(tag("dir "), alpha1))(input)
+    value(LsLine::Dir, preceded(tag("dir "), alpha1)).parse(input)
 }
 
 fn parse_ls_file_line(input: &str) -> IResult<&str, LsLine> {
@@ -106,21 +103,23 @@ fn parse_ls_file_line(input: &str) -> IResult<&str, LsLine> {
             complete::u32,
             pair(
                 complete::char(' '),
-                take_while1(|c| is_alphabetic(c as u8) || c == '.'),
+                take_while1(|c: char| c.is_alphabetic() || c == '.'),
             ),
         ),
         LsLine::File,
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_cd(input: &str) -> IResult<&str, Command> {
     map(
         preceded(
             tag("$ cd "),
-            take_while1(|c| is_alphabetic(c as u8) || c == '.' || c == '/'),
+            take_while1(|c: char| c.is_alphabetic() || c == '.' || c == '/'),
         ),
         |s: &str| Command::Cd(s.to_owned()),
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<HashMap<String, u32>> {

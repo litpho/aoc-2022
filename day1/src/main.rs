@@ -4,7 +4,7 @@ use nom::{
     combinator::map,
     multi::separated_list1,
     sequence::pair,
-    IResult,
+    IResult, Parser,
 };
 
 const DATA: &str = include_str!("input.txt");
@@ -38,13 +38,14 @@ fn part_two(mut input: Vec<u32>) -> u32 {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<u32>> {
-    separated_list1(pair(line_ending, line_ending), parse_lines)(input)
+    separated_list1(pair(line_ending, line_ending), parse_lines).parse(input)
 }
 
 fn parse_lines(input: &str) -> IResult<&str, u32> {
     map(separated_list1(line_ending, complete::u32), |items| {
         items.iter().sum()
-    })(input)
+    })
+    .parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<u32>> {

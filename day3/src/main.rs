@@ -1,11 +1,10 @@
-use std::collections::HashSet;
-
 use anyhow::Result;
 use nom::{
     character::{complete::alpha1, complete::line_ending},
     multi::separated_list1,
-    IResult,
+    IResult, Parser,
 };
+use std::collections::HashSet;
 
 const DATA: &str = include_str!("input.txt");
 
@@ -62,7 +61,7 @@ fn get_value(c: char) -> u32 {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<&str>> {
-    separated_list1(line_ending, parse_line)(input)
+    separated_list1(line_ending, parse_line).parse(input)
 }
 
 fn parse_line(input: &str) -> IResult<&str, &str> {

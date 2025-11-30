@@ -1,11 +1,12 @@
 use anyhow::Result;
-use nom::bytes::complete::tag;
-use nom::character::complete;
-use nom::character::complete::line_ending;
-use nom::combinator::map;
-use nom::multi::separated_list1;
-use nom::sequence::separated_pair;
-use nom::IResult;
+use nom::{
+    bytes::complete::tag,
+    character::complete::{self, line_ending},
+    combinator::map,
+    multi::separated_list1,
+    sequence::separated_pair,
+    IResult, Parser,
+};
 use std::cmp::{max, min};
 use std::collections::HashSet;
 
@@ -138,7 +139,7 @@ fn make_grid(coords: Vec<Vec<(Coord, Coord)>>) -> Grid {
 }
 
 fn parse(input: &str) -> IResult<&str, Grid> {
-    map(separated_list1(line_ending, parse_line), make_grid)(input)
+    map(separated_list1(line_ending, parse_line), make_grid).parse(input)
 }
 
 fn parse_line(input: &str) -> IResult<&str, Vec<(Coord, Coord)>> {
@@ -146,14 +147,16 @@ fn parse_line(input: &str) -> IResult<&str, Vec<(Coord, Coord)>> {
         v.windows(2)
             .map(|w| (w[0].to_owned(), w[1].to_owned()))
             .collect::<Vec<(Coord, Coord)>>()
-    })(input)
+    })
+    .parse(input)
 }
 
 fn parse_point(input: &str) -> IResult<&str, Coord> {
     map(
         separated_pair(complete::u32, complete::char(','), complete::u32),
         |(x, y)| (x, y),
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Grid> {

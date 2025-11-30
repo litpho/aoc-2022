@@ -1,14 +1,12 @@
-use std::{collections::HashSet, ops::RangeInclusive};
-
 use anyhow::Result;
 use nom::{
     bytes::complete::tag,
     character::complete::{self, line_ending},
     combinator::map,
     multi::separated_list1,
-    sequence::tuple,
-    IResult,
+    IResult, Parser,
 };
+use std::{collections::HashSet, ops::RangeInclusive};
 
 const DATA: &str = include_str!("input.txt");
 
@@ -56,7 +54,7 @@ fn part_two(input: &[SensorInfo], max: i32) -> i64 {
             ranges.iter().for_each(|r| {
                 println!("- {:?}", r);
             });
-            let x = if range.end() < remainder.get(0).unwrap().start() {
+            let x = if range.end() < remainder.first().unwrap().start() {
                 range.end() + 1
             } else {
                 range.start() - 1
@@ -137,26 +135,28 @@ impl SensorInfo {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<SensorInfo>> {
-    separated_list1(line_ending, parse_line)(input)
+    separated_list1(line_ending, parse_line).parse(input)
 }
 
 fn parse_line(input: &str) -> IResult<&str, SensorInfo> {
     map(
-        tuple((
+        (
             tag("Sensor at "),
             parse_coord,
             tag(": closest beacon is at "),
             parse_coord,
-        )),
+        ),
         |(_, sensor, _, beacon)| SensorInfo { sensor, beacon },
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_coord(input: &str) -> IResult<&str, Coord> {
     map(
-        tuple((tag("x="), complete::i32, tag(", y="), complete::i32)),
+        (tag("x="), complete::i32, tag(", y="), complete::i32),
         |(_, x, _, y)| (x, y),
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<SensorInfo>> {

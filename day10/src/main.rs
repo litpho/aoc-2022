@@ -6,7 +6,7 @@ use nom::{
     combinator::{map, value},
     multi::separated_list1,
     sequence::preceded,
-    IResult,
+    IResult, Parser,
 };
 use std::{collections::HashMap, ops::Rem};
 
@@ -93,21 +93,22 @@ enum Instruction {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<Vec<Instruction>>> {
-    separated_list1(line_ending, parse_line)(input)
+    separated_list1(line_ending, parse_line).parse(input)
 }
 
 fn parse_line(input: &str) -> IResult<&str, Vec<Instruction>> {
-    alt((parse_addx, parse_noop))(input)
+    alt((parse_addx, parse_noop)).parse(input)
 }
 
 fn parse_addx(input: &str) -> IResult<&str, Vec<Instruction>> {
     map(preceded(tag("addx "), complete::i32), |amount| {
         vec![Instruction::Noop, Instruction::AddX(amount)]
-    })(input)
+    })
+    .parse(input)
 }
 
 fn parse_noop(input: &str) -> IResult<&str, Vec<Instruction>> {
-    value(vec![Instruction::Noop], tag("noop"))(input)
+    value(vec![Instruction::Noop], tag("noop")).parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<Instruction>> {

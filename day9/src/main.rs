@@ -1,13 +1,12 @@
-use std::collections::HashSet;
-
 use anyhow::{Error, Result};
 use nom::{
-    character::{complete, complete::line_ending, complete::one_of},
+    character::complete::{self, line_ending, one_of},
     combinator::map_res,
     multi::separated_list1,
     sequence::separated_pair,
-    IResult,
+    IResult, Parser,
 };
+use std::collections::HashSet;
 
 const DATA: &str = include_str!("input.txt");
 
@@ -112,14 +111,15 @@ impl TryFrom<(char, u8)> for Instruction {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<Instruction>> {
-    separated_list1(line_ending, parse_line)(input)
+    separated_list1(line_ending, parse_line).parse(input)
 }
 
 fn parse_line(input: &str) -> IResult<&str, Instruction> {
     map_res(
         separated_pair(one_of("URDL"), complete::char(' '), complete::u8),
         Instruction::try_from,
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<Instruction>> {

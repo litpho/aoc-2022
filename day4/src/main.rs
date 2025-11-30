@@ -1,10 +1,9 @@
-use std::ops::RangeInclusive;
-
 use anyhow::Result;
 use nom::{
     character::complete, character::complete::line_ending, combinator::map, multi::separated_list1,
-    sequence::separated_pair, IResult,
+    sequence::separated_pair, IResult, Parser,
 };
+use std::ops::RangeInclusive;
 
 const DATA: &str = include_str!("input.txt");
 
@@ -59,21 +58,23 @@ impl AssignmentPair {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<AssignmentPair>> {
-    separated_list1(line_ending, parse_line)(input)
+    separated_list1(line_ending, parse_line).parse(input)
 }
 
 fn parse_line(input: &str) -> IResult<&str, AssignmentPair> {
     map(
         separated_pair(parse_range, complete::char(','), parse_range),
         |(first, second)| AssignmentPair { first, second },
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_range(input: &str) -> IResult<&str, RangeInclusive<u32>> {
     map(
         separated_pair(complete::u32, complete::char('-'), complete::u32),
         |(start, end)| start..=end,
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<AssignmentPair>> {

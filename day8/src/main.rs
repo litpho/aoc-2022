@@ -1,10 +1,7 @@
 use anyhow::Result;
 use nom::{
-    bytes::complete::take_while1,
-    character::{complete::line_ending, is_digit},
-    combinator::map,
-    multi::separated_list1,
-    IResult,
+    bytes::complete::take_while1, character::complete::line_ending, combinator::map,
+    multi::separated_list1, AsChar, IResult, Parser,
 };
 
 const DATA: &str = include_str!("input.txt");
@@ -116,13 +113,14 @@ fn scenic_to_bottom(x: usize, y: usize, height: &u8, input: &[Vec<u8>]) -> u32 {
 }
 
 fn parse(input: &[u8]) -> IResult<&[u8], Vec<Vec<u8>>> {
-    separated_list1(line_ending, parse_line)(input)
+    separated_list1(line_ending, parse_line).parse(input)
 }
 
 fn parse_line(input: &[u8]) -> IResult<&[u8], Vec<u8>> {
-    map(take_while1(is_digit), |line: &[u8]| {
+    map(take_while1(|c: u8| c.is_dec_digit()), |line: &[u8]| {
         line.iter().map(|b| b - b'0').collect::<Vec<u8>>()
-    })(input)
+    })
+    .parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<Vec<u8>>> {

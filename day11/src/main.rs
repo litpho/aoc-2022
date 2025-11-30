@@ -1,5 +1,3 @@
-use std::{collections::HashMap, ops::Rem};
-
 use anyhow::Result;
 use nom::{
     branch::alt,
@@ -7,9 +5,10 @@ use nom::{
     character::complete::{self, line_ending},
     combinator::{map, value},
     multi::separated_list1,
-    sequence::{delimited, pair, preceded, terminated, tuple},
-    IResult,
+    sequence::{delimited, pair, preceded, terminated},
+    IResult, Parser,
 };
+use std::{collections::HashMap, ops::Rem};
 
 const DATA: &str = include_str!("input.txt");
 
@@ -126,23 +125,24 @@ impl Operation {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<Monkey>> {
-    separated_list1(pair(line_ending, line_ending), parse_monkey)(input)
+    separated_list1(pair(line_ending, line_ending), parse_monkey).parse(input)
 }
 
 fn parse_monkey(input: &str) -> IResult<&str, Monkey> {
     map(
-        tuple((
+        (
             parse_monkey_id_line,
             parse_monkey_items_line,
             parse_operation_line,
             parse_test_div_line,
             parse_target_true_line,
             parse_target_false,
-        )),
+        ),
         |(id, items, operation, test_div, target_true, target_false)| {
             Monkey::new(id, items, operation, test_div, target_true, target_false)
         },
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_monkey_id_line(input: &str) -> IResult<&str, usize> {
@@ -152,7 +152,8 @@ fn parse_monkey_id_line(input: &str) -> IResult<&str, usize> {
             line_ending,
         ),
         |id| id as usize,
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_monkey_items_line(input: &str) -> IResult<&str, Vec<u64>> {
@@ -162,7 +163,8 @@ fn parse_monkey_items_line(input: &str) -> IResult<&str, Vec<u64>> {
             separated_list1(tag(", "), complete::u64),
         ),
         line_ending,
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_operation_line(input: &str) -> IResult<&str, Operation> {
@@ -176,29 +178,32 @@ fn parse_operation_line(input: &str) -> IResult<&str, Operation> {
             )),
         ),
         line_ending,
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_addition(input: &str) -> IResult<&str, Operation> {
-    map(preceded(tag("+ "), complete::u64), Operation::Addition)(input)
+    map(preceded(tag("+ "), complete::u64), Operation::Addition).parse(input)
 }
 
 fn parse_multiplication(input: &str) -> IResult<&str, Operation> {
     map(
         preceded(tag("* "), complete::u64),
         Operation::Multiplication,
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_self_multiplication(input: &str) -> IResult<&str, Operation> {
-    value(Operation::Squared, tag("* old"))(input)
+    value(Operation::Squared, tag("* old")).parse(input)
 }
 
 fn parse_test_div_line(input: &str) -> IResult<&str, u64> {
     terminated(
         preceded(tag("  Test: divisible by "), complete::u64),
         line_ending,
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_target_true_line(input: &str) -> IResult<&str, usize> {
@@ -208,14 +213,16 @@ fn parse_target_true_line(input: &str) -> IResult<&str, usize> {
             line_ending,
         ),
         |id| id as usize,
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_target_false(input: &str) -> IResult<&str, usize> {
     map(
         preceded(tag("    If false: throw to monkey "), complete::u8),
         |id| id as usize,
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<Monkey>> {

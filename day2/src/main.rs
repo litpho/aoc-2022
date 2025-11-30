@@ -1,9 +1,9 @@
 use anyhow::{Error, Result};
 use nom::{
-    character::{complete, complete::line_ending, complete::one_of},
+    character::complete::{self, line_ending, one_of},
     multi::separated_list1,
     sequence::separated_pair,
-    IResult,
+    IResult, Parser,
 };
 
 const DATA: &str = include_str!("input.txt");
@@ -145,11 +145,11 @@ impl TryFrom<char> for Move {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<(char, char)>> {
-    separated_list1(line_ending, parse_line)(input)
+    separated_list1(line_ending, parse_line).parse(input)
 }
 
 fn parse_line(input: &str) -> IResult<&str, (char, char)> {
-    separated_pair(one_of("ABC"), complete::char(' '), one_of("XYZ"))(input)
+    separated_pair(one_of("ABC"), complete::char(' '), one_of("XYZ")).parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<(char, char)>> {

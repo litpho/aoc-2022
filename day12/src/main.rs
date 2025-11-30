@@ -1,7 +1,7 @@
 use anyhow::Result;
 use nom::{
     bytes::complete::is_a, character::complete::line_ending, combinator::map,
-    multi::separated_list1, IResult,
+    multi::separated_list1, IResult, Parser,
 };
 use pathfinding::prelude::bfs;
 
@@ -65,7 +65,7 @@ struct Coord(usize, usize);
 
 impl Coord {
     fn next_steps(&self, input: &[Vec<u8>]) -> Vec<Coord> {
-        let width = input.get(0).unwrap().len() - 1;
+        let width = input.first().unwrap().len() - 1;
         let height = input.len() - 1;
 
         let mut next_steps = vec![];
@@ -116,13 +116,14 @@ fn get_height<'a>(input: &'a [Vec<u8>], coord: &Coord) -> &'a u8 {
 }
 
 fn parse(input: &[u8]) -> IResult<&[u8], Vec<Vec<u8>>> {
-    separated_list1(line_ending, parse_line)(input)
+    separated_list1(line_ending, parse_line).parse(input)
 }
 
 fn parse_line(input: &[u8]) -> IResult<&[u8], Vec<u8>> {
     map(is_a("abcdefghijklmnopqrstuvwxyzES"), |line: &[u8]| {
         line.to_vec()
-    })(input)
+    })
+    .parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<Vec<u8>>> {

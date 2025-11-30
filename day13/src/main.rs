@@ -1,5 +1,3 @@
-use std::cmp::Ordering;
-
 use anyhow::Result;
 use nom::{
     branch::alt,
@@ -7,8 +5,9 @@ use nom::{
     combinator::map,
     multi::{separated_list0, separated_list1},
     sequence::{delimited, pair, separated_pair},
-    IResult,
+    IResult, Parser,
 };
+use std::cmp::Ordering;
 
 const DATA: &str = include_str!("input.txt");
 
@@ -79,11 +78,11 @@ impl Ord for Node {
 }
 
 fn parse(input: &str) -> IResult<&str, Vec<(Node, Node)>> {
-    separated_list1(pair(line_ending, line_ending), parse_pair)(input)
+    separated_list1(pair(line_ending, line_ending), parse_pair).parse(input)
 }
 
 fn parse_pair(input: &str) -> IResult<&str, (Node, Node)> {
-    separated_pair(parse_line, line_ending, parse_line)(input)
+    separated_pair(parse_line, line_ending, parse_line).parse(input)
 }
 
 fn parse_line(input: &str) -> IResult<&str, Node> {
@@ -94,11 +93,12 @@ fn parse_line(input: &str) -> IResult<&str, Node> {
             complete::char(']'),
         ),
         Node::Nodes,
-    )(input)
+    )
+    .parse(input)
 }
 
 fn parse_value(input: &str) -> IResult<&str, Node> {
-    alt((parse_line, map(complete::u8, Node::Value)))(input)
+    alt((parse_line, map(complete::u8, Node::Value))).parse(input)
 }
 
 fn parse_input(input: &'static str) -> Result<Vec<(Node, Node)>> {
