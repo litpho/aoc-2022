@@ -55,7 +55,7 @@ mod tests {
     #[test]
     fn test_part_one() -> Result<()> {
         let input = parse_input(DATA);
-        assert_eq!(1134, part_one(input));
+        assert_eq!(part_one(input), 1134);
 
         Ok(())
     }
@@ -72,7 +72,7 @@ mod tests {
     #[test]
     fn test_part_two() -> Result<()> {
         let input = parse_input(DATA);
-        assert_eq!(2263, part_two(input));
+        assert_eq!(part_two(input), 2263);
 
         Ok(())
     }

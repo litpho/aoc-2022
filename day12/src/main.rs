@@ -140,28 +140,28 @@ mod tests {
 
     #[test]
     fn test_part_one_testdata() -> Result<()> {
-        assert_eq!(31, part_one(&parse_input(TESTDATA)?));
+        assert_eq!(part_one(&parse_input(TESTDATA)?), 31);
 
         Ok(())
     }
 
     #[test]
     fn test_part_one() -> Result<()> {
-        assert_eq!(425, part_one(&parse_input(DATA)?));
+        assert_eq!(part_one(&parse_input(DATA)?), 425);
 
         Ok(())
     }
 
     #[test]
     fn test_part_two_testdata() -> Result<()> {
-        assert_eq!(29, part_two(&parse_input(TESTDATA)?));
+        assert_eq!(part_two(&parse_input(TESTDATA)?), 29);
 
         Ok(())
     }
 
     #[test]
     fn test_part_two() -> Result<()> {
-        assert_eq!(418, part_two(&parse_input(DATA)?));
+        assert_eq!(part_two(&parse_input(DATA)?), 418);
 
         Ok(())
     }

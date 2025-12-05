@@ -239,28 +239,28 @@ mod tests {
 
     #[test]
     fn test_part_one_testdata() -> Result<()> {
-        assert_eq!(10605, part_one(&mut parse_input(TESTDATA)?));
+        assert_eq!(part_one(&mut parse_input(TESTDATA)?), 10605);
 
         Ok(())
     }
 
     #[test]
     fn test_part_one() -> Result<()> {
-        assert_eq!(90882, part_one(&mut parse_input(DATA)?));
+        assert_eq!(part_one(&mut parse_input(DATA)?), 90882);
 
         Ok(())
     }
 
     #[test]
     fn test_part_two_testdata() -> Result<()> {
-        assert_eq!(2713310158, part_two(&mut parse_input(TESTDATA)?));
+        assert_eq!(part_two(&mut parse_input(TESTDATA)?), 2713310158);
 
         Ok(())
     }
 
     #[test]
     fn test_part_two() -> Result<()> {
-        assert_eq!(30893109657, part_two(&mut parse_input(DATA)?));
+        assert_eq!(part_two(&mut parse_input(DATA)?), 30893109657);
 
         Ok(())
     }

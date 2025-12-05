@@ -129,14 +129,14 @@ mod tests {
 
     #[test]
     fn test_part_one_testdata() -> Result<()> {
-        assert_eq!(13140, part_one(&parse_input(TESTDATA)?));
+        assert_eq!(part_one(&parse_input(TESTDATA)?), 13140);
 
         Ok(())
     }
 
     #[test]
     fn test_part_one() -> Result<()> {
-        assert_eq!(15260, part_one(&parse_input(DATA)?));
+        assert_eq!(part_one(&parse_input(DATA)?), 15260);
 
         Ok(())
     }

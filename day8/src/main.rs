@@ -137,7 +137,7 @@ mod tests {
 
     #[test]
     fn test_part_one_testdata() -> Result<()> {
-        assert_eq!(21, part_one(&parse_input(TESTDATA)?));
+        assert_eq!(part_one(&parse_input(TESTDATA)?), 21);
 
         Ok(())
     }
@@ -145,14 +145,14 @@ mod tests {
     #[test]
     fn test_part_one() -> Result<()> {
         let input = parse_input(DATA)?;
-        assert_eq!(1807, part_one(&input));
+        assert_eq!(part_one(&input), 1807);
 
         Ok(())
     }
 
     #[test]
     fn test_part_two_testdata() -> Result<()> {
-        assert_eq!(8, part_two(&parse_input(TESTDATA)?));
+        assert_eq!(part_two(&parse_input(TESTDATA)?), 8);
 
         Ok(())
     }
@@ -160,7 +160,7 @@ mod tests {
     #[test]
     fn test_part_two() -> Result<()> {
         let input = parse_input(DATA)?;
-        assert_eq!(480000, part_two(&input));
+        assert_eq!(part_two(&input), 480000);
 
         Ok(())
     }
